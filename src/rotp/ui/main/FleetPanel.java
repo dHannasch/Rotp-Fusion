@@ -547,9 +547,17 @@ public class FleetPanel extends BasePanel implements MapSpriteViewer {
             g.setFont(narrowFont(20));
             if (fl.launched()
             || (fl.deployed() && !pl.knowETA(fl))) {
-                if (pl.knowETA(fl) && (fl.hasDestination())) {
-                    String dest =  pl.sv.name(fl.destSysId());
+                if ((pl.knowETA(fl) && (fl.hasDestination())) || (options().selectedTrackUFOsAcrossTurns() && pl.knowsLastTurnLocationOf(fl))) {
+                    String dest;
+                    if (pl.knowETA(fl))
+                        dest =  pl.sv.name(fl.destSysId());
+                    else
+                        dest =  pl.sv.name(pl.suspectedDestinationOfVisibleShip(fl).id);
                     String str2 = dest.isEmpty() ? text("MAIN_FLEET_DEST_UNSCOUTED") : text("MAIN_FLEET_DESTINATION", dest);
+                    // We could do something more elaborate here, this is just something that's easy to do without editing the text files.
+                    // This just needs to indicate uncertainty if we don't actually know the destination with certainty.
+                    if (!pl.knowETA(fl))
+                        str2 += "?";
                     int sw2 = g.getFontMetrics().stringWidth(str2);
                     drawString(g,str2, w-sw2-s10, y0);
                     y0 -= s25;

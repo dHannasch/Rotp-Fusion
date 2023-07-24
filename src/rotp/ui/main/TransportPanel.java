@@ -153,9 +153,17 @@ public class TransportPanel extends BasePanel {
             g.setColor(SystemPanel.whiteText);
             g.setFont(narrowFont(20));
 
-            if (pl.knowETA(tr)) {
-                String dest =  pl.sv.name(tr.destination().id);
+            if (pl.knowETA(tr) || (options().selectedTrackUFOsAcrossTurns() && pl.knowsLastTurnLocationOf(tr))) {
+                String dest;
+                if (pl.knowETA(tr))
+                    dest =  pl.sv.name(tr.destination().id);
+                else
+                    dest = pl.sv.name(pl.suspectedDestinationOfVisibleShip(tr).id);
                 String str2 = dest.isEmpty() ? text("MAIN_FLEET_DEST_UNSCOUTED") : text("MAIN_FLEET_DESTINATION", dest);
+                // We could do something more elaborate here, this is just something that's easy to do without editing the text files.
+                // This just needs to indicate uncertainty if we don't actually know the destination with certainty.
+                if (!pl.knowETA(tr))
+                    str2 += "?";
                 int sw2 = g.getFontMetrics().stringWidth(str2);
                 drawString(g,str2, w-sw2-s10, y0);
                 y0 -= s25;
